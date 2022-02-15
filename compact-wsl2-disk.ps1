@@ -7,7 +7,8 @@ $wsl_folders = @(
     # WSL OSes from the Windows Store
     "$env:LOCALAPPDATA\Packages",
     # The Docker WSL files
-    "$env:LOCALAPPDATA\Docker"
+    "$env:LOCALAPPDATA\Docker",
+    "C:\Arch"
 )
 # Allow user definitions via an environment variable, WSL_FOLDERS
 if (Test-Path env:WSL_FOLDERS) {
@@ -39,23 +40,23 @@ wsl -e sudo fstrim /
 wsl --shutdown
 
 foreach ($file in $files) {
-	$disk = $file.FullName
-	write-output "-----"
-	write-output "Disk to compact: $($disk)"
-	write-output "Length: $($file.Length/1MB) MB"
-	write-output "Compacting disk (starting diskpart)"
+$disk = $file.FullName
+write-output "-----"
+write-output "Disk to compact: $($disk)"
+write-output "Length: $($file.Length/1MB) MB"
+write-output "Compacting disk (starting diskpart)"
 
 @"
-select vdisk file=$disk
-attach vdisk readonly
-compact vdisk
-detach vdisk
-exit
+	select vdisk file=$disk
+	attach vdisk readonly
+	compact vdisk
+	detach vdisk
+	exit
 "@ | diskpart
 
-	write-output ""
-	write-output "Success. Compacted $disk."
-	write-output "New length: $((Get-Item $disk).Length/1MB) MB"
+write-output ""
+write-output "Success. Compacted $disk."
+write-output "New length: $((Get-Item $disk).Length/1MB) MB"
 
 }
 write-output "======="
